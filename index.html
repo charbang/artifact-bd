@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BASES DE DATOS RECAP</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --black: #050505;
+            --black-2: #090909;
+            --black-3: #101010;
+            --gray: #171717;
+            --gray-2: #242424;
+            --gray-3: #444;
+            --gray-4: #777;
+            --white: #f4f4f4;
+            --white-soft: #cfcfcf;
+
+            --font-main: "Space Grotesk", sans-serif;
+            --font-code: "JetBrains Mono", monospace;
+
+            --transition: 280ms cubic-bezier(.2, .8, .2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: .035;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.5) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.5) 1px,
+                    transparent 1px
+                );
+
+            background-size: 60px 60px;
+        }
+
+        ::selection {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--white);
+        }
+
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6vw;
+
+            border-bottom: 1px solid rgba(255,255,255,.08);
+
+            background: rgba(5,5,5,.82);
+            backdrop-filter: blur(15px);
+
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-family: var(--font-code);
+            font-size: .72rem;
+            letter-spacing: .25em;
+            color: var(--white);
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            font-family: var(--font-code);
+            font-size: .62rem;
+            color: var(--gray-4);
+            text-transform: uppercase;
+            letter-spacing: .15em;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--white);
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 8px rgba(255,255,255,.8);
+
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: .35;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+      
+
+        .hero {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+
+            padding: 130px 7vw 80px;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 500px;
+            height: 500px;
+
+            right: -180px;
+            top: 100px;
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            transform: rotate(45deg);
+
+            box-shadow:
+                0 0 100px rgba(255,255,255,.03);
+        }
+
+        .hero-grid {
+            width: 100%;
+            max-width: 1350px;
+            margin: auto;
+
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+
+            gap: 80px;
+
+            align-items: center;
+        }
+
+        .eyebrow {
+            font-family: var(--font-code);
+            font-size: .67rem;
+
+            letter-spacing: .3em;
+            text-transform: uppercase;
+
+            color: var(--gray-4);
+
+            margin-bottom: 25px;
+        }
+
+        .hero h1 {
+            font-size: clamp(4rem, 10vw, 9rem);
+            line-height: .78;
+
+            letter-spacing: -.08em;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+        .hero h1 span {
+            display: block;
+            color: #686868;
+        }
+
+        .hero-description {
+            max-width: 720px;
+
+            color: var(--white-soft);
+
+            font-size: 1.05rem;
+
+            line-height: 1.8;
+
+            margin-top: 38px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 35px;
+
+            margin-top: 35px;
+
+            font-family: var(--font-code);
+            font-size: .62rem;
+
+            color: var(--gray-4);
+
+            text-transform: uppercase;
+            letter-spacing: .1em;
+        }
+
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            margin-top: 35px;
+        }
+
+        .button {
+            position: relative;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 175px;
+
+            padding: 15px 24px;
+
+            border: 1px solid #444;
+
+            background: #0a0a0a;
+
+            color: white;
+
+            font-family: var(--font-code);
+            font-size: .68rem;
+
+            text-transform: uppercase;
+            letter-spacing: .16em;
+
+            overflow: hidden;
+
+            transition:
+                transform var(--transition),
+                border-color var(--transition),
+                color var(--transition);
+        }
+
+        .button::before {
+            content: "";
+
+            position: absolute;
+
+            left: -100%;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background: white;
+
+            transition: left var(--transition);
+
+            z-index: 0;
+        }
+
+        .button span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .button:hover {
+            color: black;
+
+            border-color: white;
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 10px 35px rgba(255,255,255,.08);
+        }
+
+        .button:hover::before {
+            left: 0;
+        }
+
+        .button.primary {
+            background: white;
+            color: black;
+            border-color: white;
+        }
+
+        .button.primary::before {
+            background: black;
+        }
+
+        .button.primary:hover {
+            color: white;
+        }
+
+
+        .database-art {
+            position: relative;
+
+            width: 100%;
+            height: 430px;
+
+            display: grid;
+            place-items: center;
+        }
+
+        .database-cylinder {
+            position: relative;
+
+            width: 245px;
+            height: 220px;
+
+            transform: perspective(700px) rotateY(-15deg);
+
+            filter:
+                drop-shadow(0 0 30px rgba(255,255,255,.08));
+        }
+
+        .db-body {
+            position: absolute;
+
+            width: 245px;
+            height: 150px;
+
+            top: 35px;
+
+            border-left: 2px solid #777;
+            border-right: 2px solid #777;
+        }
+
+        .db-layer {
+            position: absolute;
+
+            width: 245px;
+            height: 70px;
+
+            border: 2px solid #aaa;
+
+            border-radius: 50%;
+
+            background: #080808;
+        }
+
+        .db-layer:nth-child(1) {
+            top: 0;
+        }
+
+        .db-layer:nth-child(2) {
+            top: 45px;
+        }
+
+        .db-layer:nth-child(3) {
+            top: 90px;
+        }
+
+        .db-glow {
+            position: absolute;
+
+            width: 350px;
+            height: 350px;
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            border-radius: 50%;
+
+            animation: rotateSlow 25s linear infinite;
+        }
+
+        @keyframes rotateSlow {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .floating-node {
+            position: absolute;
+
+            width: 8px;
+            height: 8px;
+
+            background: white;
+
+            box-shadow:
+                0 0 15px white;
+        }
+
+        .node-1 {
+            top: 18%;
+            left: 15%;
+        }
+
+        .node-2 {
+            top: 25%;
+            right: 15%;
+        }
+
+        .node-3 {
+            bottom: 18%;
+            left: 25%;
+        }
+
+        .node-4 {
+            bottom: 23%;
+            right: 22%;
+        }
+
+
+        .section {
+            max-width: 1350px;
+            margin: auto;
+
+            padding: 120px 7vw;
+        }
+
+        .section-header {
+            display: grid;
+
+            grid-template-columns: .8fr 1.2fr;
+
+            gap: 60px;
+
+            align-items: end;
+
+            margin-bottom: 55px;
+        }
+
+        .section-number {
+            font-family: var(--font-code);
+
+            font-size: .65rem;
+
+            color: #666;
+
+            letter-spacing: .3em;
+
+            margin-bottom: 15px;
+        }
+
+        .section h2 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+
+            line-height: .9;
+
+            letter-spacing: -.06em;
+
+            text-transform: uppercase;
+        }
+
+        .section-description {
+            color: #999;
+
+            line-height: 1.8;
+
+            max-width: 650px;
+        }
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 16px;
+        }
+
+        .card {
+            min-height: 240px;
+
+            padding: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #111,
+                    #080808
+                );
+
+            border: 1px solid #292929;
+
+            position: relative;
+
+            overflow: hidden;
+
+            transition:
+                transform var(--transition),
+                border-color var(--transition);
+        }
+
+        .card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            right: -100px;
+            bottom: -100px;
+
+            border: 1px solid #292929;
+
+            border-radius: 50%;
+
+            transition: transform var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+
+            border-color: #666;
+        }
+
+        .card:hover::after {
+            transform: scale(1.5);
+        }
+
+        .card-number {
+            font-family: var(--font-code);
+
+            color: #555;
+
+            font-size: .65rem;
+
+            letter-spacing: .2em;
+        }
+
+        .card-icon {
+            width: 52px;
+            height: 52px;
+
+            display: grid;
+            place-items: center;
+
+            border: 1px solid #555;
+
+            font-family: var(--font-code);
+
+            margin: 20px 0;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+
+            text-transform: uppercase;
+
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #888;
+
+            font-size: .9rem;
+
+            line-height: 1.7;
+        }
+
+
+
+        .compare {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 18px;
+        }
+
+        .compare-card {
+            padding: 40px;
+
+            border: 1px solid #292929;
+
+            background: #090909;
+
+            min-height: 420px;
+
+            transition: var(--transition);
+        }
+
+        .compare-card:hover {
+            border-color: #666;
+
+            transform: translateY(-5px);
+        }
+
+        .compare-card.sql {
+            border-top: 3px solid white;
+        }
+
+        .compare-card.nosql {
+            border-top: 3px solid #666;
+        }
+
+        .compare-label {
+            font-family: var(--font-code);
+
+            font-size: .62rem;
+
+            color: #666;
+
+            letter-spacing: .2em;
+
+            text-transform: uppercase;
+        }
+
+        .compare-card h3 {
+            font-size: 3rem;
+
+            margin: 15px 0 25px;
+
+            letter-spacing: -.05em;
+        }
+
+        .compare-card ul {
+            list-style: none;
+        }
+
+        .compare-card li {
+            padding: 12px 0;
+
+            border-bottom: 1px solid #222;
+
+            color: #999;
+
+            font-size: .9rem;
+        }
+
+        .compare-card li::before {
+            content: "// ";
+
+            color: white;
+
+            font-family: var(--font-code);
+        }
+
+        .nodes-section {
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+
+            background: #080808;
+        }
+
+        .node-map {
+            height: 460px;
+
+            border: 1px solid #292929;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(255,255,255,.08),
+                    transparent 30%
+                ),
+                #050505;
+        }
+
+        .node-map svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node-map line {
+            stroke: #444;
+            stroke-width: 1;
+        }
+
+        .node-map circle {
+            fill: white;
+        }
+
+        .node-label {
+            position: absolute;
+
+            transform: translate(-50%, -50%);
+
+            padding: 9px 14px;
+
+            background: #080808;
+
+            border: 1px solid #555;
+
+            font-family: var(--font-code);
+
+            font-size: .6rem;
+
+            letter-spacing: .12em;
+
+            text-transform: uppercase;
+
+            transition: .25s;
+        }
+
+        .node-label:hover {
+            border-color: white;
+
+            box-shadow:
+                0 0 20px rgba(255,255,255,.1);
+        }
+
+        .node-center {
+            left: 50%;
+            top: 50%;
+        }
+
+        .node-user {
+            left: 19%;
+            top: 23%;
+        }
+
+        .node-product {
+            left: 81%;
+            top: 23%;
+        }
+
+        .node-buy {
+            left: 20%;
+            top: 78%;
+        }
+
+        .node-recommend {
+            left: 80%;
+            top: 78%;
+        }
+
+        .curiosity {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 12px;
+
+            margin-top: 20px;
+        }
+
+        .curiosity-button {
+            min-height: 120px;
+
+            padding: 20px;
+
+            border: 1px solid #292929;
+
+            background: #0a0a0a;
+
+            color: white;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+        }
+
+        .curiosity-button:hover {
+            border-color: #777;
+
+            transform: translateY(-4px);
+        }
+
+        .curiosity-button small {
+            display: block;
+
+            color: #666;
+
+            margin-top: 12px;
+
+            font-family: var(--font-code);
+
+            text-transform: uppercase;
+
+            font-size: .55rem;
+        }
+
+        .answer {
+            display: none;
+
+            margin-top: 15px;
+
+            padding: 22px;
+
+            background: #0b0b0b;
+
+            border-left: 2px solid white;
+
+            color: #999;
+        }
+
+        .answer.active {
+            display: block;
+
+            animation: reveal .3s ease;
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+
+        footer {
+            padding: 60px 7vw;
+
+            border-top: 1px solid #222;
+        }
+
+        .footer-inner {
+            max-width: 1350px;
+
+            margin: auto;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 30px;
+
+            flex-wrap: wrap;
+        }
+
+        .footer-title {
+            font-family: var(--font-code);
+
+            font-size: .75rem;
+
+            letter-spacing: .25em;
+        }
+
+        .footer-info {
+            color: #666;
+
+            font-family: var(--font-code);
+
+            font-size: .6rem;
+
+            text-transform: uppercase;
+
+            line-height: 2;
+        }
+
+    
+
+        @media (max-width: 900px) {
+
+            .hero-grid,
+            .section-header,
+            .compare {
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .curiosity {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .database-art {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            nav {
+                padding: 0 5vw;
+            }
+
+            .nav-status {
+                display: none;
+            }
+
+            .hero,
+            .section {
+                padding-left: 5vw;
+                padding-right: 5vw;
+            }
+
+            .hero h1 {
+                font-size: 4rem;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .curiosity {
+                grid-template-columns: 1fr;
+            }
+
+            .node-map {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================
+         NAVBAR
+    ============================= -->
+
+    <nav>
+
+        <div class="nav-logo">
+            DB_RECAP / 01
+        </div>
+
+        <div class="nav-status">
+            <span class="status-dot"></span>
+            SYSTEM ONLINE
+        </div>
+
+    </nav>
+
+
+    <header class="hero">
+
+        <div class="hero-grid">
+
+            <div>
+
+                <div class="eyebrow">
+                    Artefacto de salida · Aprendizaje
+                </div>
+
+                <h1>
+                    BASES DE
+                    <span>DATOS</span>
+                    RECAP
+                </h1>
+
+                <p class="hero-description">
+                    Una exploración visual de los fundamentos de las
+                    bases de datos: información, estructuras,
+                    relaciones, SQL, NoSQL y el concepto de nodos
+                    como puerta de entrada al mundo de los grafos.
+                </p>
+
+                <div class="buttons">
+
+                    <a href="sql.html" class="button primary">
+                        <span>
+                            Explorar SQL →
+                        </span>
+                    </a>
+
+                    <a href="nosql.html" class="button">
+                        <span>
+                            Explorar NoSQL →
+                        </span>
+                    </a>
+
+                </div>
+
+                <div class="hero-meta">
+
+                    <span>
+                        DATABASE_SYSTEM
+                    </span>
+
+                    <span>
+                        / FUNDAMENTALS
+                    </span>
+
+                    <span>
+                        / RECAP
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="database-art">
+
+                <div class="db-glow"></div>
+
+                <span class="floating-node node-1"></span>
+                <span class="floating-node node-2"></span>
+                <span class="floating-node node-3"></span>
+                <span class="floating-node node-4"></span>
+
+                <div class="database-cylinder">
+
+                    <div class="db-body"></div>
+
+                    <div class="db-layer"></div>
+                    <div class="db-layer"></div>
+                    <div class="db-layer"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-number">
+                    01 / FUNDAMENTOS
+                </div>
+
+                <h2>
+                    ¿Qué es una
+                    base de datos?
+                </h2>
+
+            </div>
+
+            <p class="section-description">
+
+                Una base de datos permite almacenar y organizar
+                información para posteriormente consultarla,
+                modificarla o eliminarla.
+
+                <br><br>
+
+                Su objetivo principal es permitir que los datos
+                puedan ser utilizados de manera estructurada
+                por personas y aplicaciones.
+
+            </p>
+
+        </div>
+
+
+        <div class="cards">
+
+            <article class="card">
+
+                <div class="card-number">
+                    FUNCTION / 01
+                </div>
+
+                <div class="card-icon">
+                    SAVE
+                </div>
+
+                <h3>
+                    Almacenar
+                </h3>
+
+                <p>
+                    Guardar información de manera organizada
+                    para poder utilizarla posteriormente.
+                </p>
+
+            </article>
+
+
+            <article class="card">
+
+                <div class="card-number">
+                    FUNCTION / 02
+                </div>
+
+                <div class="card-icon">
+                    FIND
+                </div>
+
+                <h3>
+                    Consultar
+                </h3>
+
+                <p>
+                    Encontrar rápidamente los datos que necesita
+                    una aplicación o una persona.
+                </p>
+
+            </article>
+
+
+            <article class="card">
+
+                <div class="card-number">
+                    FUNCTION / 03
+                </div>
+
+                <div class="card-icon">
+                    EDIT
+                </div>
+
+                <h3>
+                    Modificar
+                </h3>
+
+                <p>
+                    Actualizar información y mantener los datos
+                    de acuerdo con el estado actual del sistema.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-number">
+                    02 / ARCHITECTURE
+                </div>
+
+                <h2>
+                    SQL
+                    <br>
+                    VS
+                    <br>
+                    NoSQL
+                </h2>
+
+            </div>
+
+            <p class="section-description">
+
+                Las bases de datos pueden utilizar diferentes
+                modelos para representar y almacenar información.
+
+                <br><br>
+
+                Las bases relacionales utilizan tablas y relaciones,
+                mientras que NoSQL engloba diferentes modelos
+                como documentos, clave-valor, columnas y grafos.
+
+            </p>
+
+        </div>
+
+
+        <div class="compare">
+
+
+            <article class="compare-card sql">
+
+                <div class="compare-label">
+                    RELATIONAL DATABASE
+                </div>
+
+                <h3>
+                    SQL
+                </h3>
+
+                <ul>
+
+                    <li>
+                        Información organizada en tablas.
+                    </li>
+
+                    <li>
+                        Esquema definido.
+                    </li>
+
+                    <li>
+                        Relaciones entre tablas.
+                    </li>
+
+                    <li>
+                        Alta consistencia e integridad.
+                    </li>
+
+                    <li>
+                        Consultas mediante SQL.
+                    </li>
+
+                </ul>
+
+                <div class="buttons">
+
+                    <a href="sql.html" class="button primary">
+                        <span>
+                            Entrar a SQL →
+                        </span>
+                    </a>
+
+                </div>
+
+            </article>
+
+
+
+            <article class="compare-card nosql">
+
+                <div class="compare-label">
+                    NON-RELATIONAL DATABASE
+                </div>
+
+                <h3>
+                    NoSQL
+                </h3>
+
+                <ul>
+
+                    <li>
+                        Documentos, grafos, columnas o clave-valor.
+                    </li>
+
+                    <li>
+                        Estructura flexible.
+                    </li>
+
+                    <li>
+                        Diferentes modelos de almacenamiento.
+                    </li>
+
+                    <li>
+                        Pensado para diferentes necesidades de escala.
+                    </li>
+
+                    <li>
+                        Puede trabajar con grandes volúmenes.
+                    </li>
+
+                </ul>
+
+                <div class="buttons">
+
+                    <a href="nosql.html" class="button">
+                        <span>
+                            Entrar a NoSQL →
+                        </span>
+                    </a>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <div class="section-number">
+                    03 / DECISION
+                </div>
+
+                <h2>
+                    ES NUESTRA
+                    ELECCION.
+                </h2>
+
+            </div>
+
+            <p class="section-description">
+
+                La tecnología debe elegirse de acuerdo con
+                las necesidades del sistema.
+
+                <br><br>
+
+                Relaciones, estructura, consistencia, volumen
+                de datos y escalabilidad son algunos factores
+                importantes.
+
+            </p>
+
+        </div>
+
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Característica</th>
+                        <th>Relacional</th>
+                        <th>No relacional</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Estructura</td>
+                        <td>Tablas</td>
+                        <td>Documentos, grafos, columnas, clave-valor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Esquema</td>
+                        <td>Definido</td>
+                        <td>Flexible</td>
+                    </tr>
+
+                    <tr>
+                        <td>Relaciones</td>
+                        <td>Muy importantes</td>
+                        <td>Dependen del modelo</td>
+                    </tr>
+
+                    <tr>
+                        <td>Integridad</td>
+                        <td>Alta</td>
+                        <td>Depende del sistema</td>
+                    </tr>
+
+                    <tr>
+                        <td>Escalabilidad</td>
+                        <td>Principalmente vertical</td>
+                        <td>Puede favorecer la horizontal</td>
+                    </tr>
+
+                    <tr>
+                        <td>Transacciones</td>
+                        <td>Excelente soporte</td>
+                        <td>Depende del motor</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="nodes-section">
+
+        <div class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <div class="section-number">
+                        04 / NEXT LEVEL
+                    </div>
+
+                    <h2>
+                        NODOS
+                    </h2>
+
+                </div>
+
+                <p class="section-description">
+
+                    Una forma diferente de pensar los datos:
+
+                    <br><br>
+
+                    ¿Qué ocurre cuando lo importante no es
+                    solamente la información, sino la conexión
+                    entre esa información?
+
+                    <br><br>
+
+                    Aquí aparecen los grafos.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="node-map">
+
+                <svg viewBox="0 0 1000 460"
+                     preserveAspectRatio="none">
+
+                    <line x1="500"
+                          y1="230"
+                          x2="190"
+                          y2="105"/>
+
+                    <line x1="500"
+                          y1="230"
+                          x2="810"
+                          y2="105"/>
+
+                    <line x1="500"
+                          y1="230"
+                          x2="200"
+                          y2="355"/>
+
+                    <line x1="500"
+                          y1="230"
+                          x2="810"
+                          y2="355"/>
+
+                    <line x1="190"
+                          y1="105"
+                          x2="810"
+                          y2="105"/>
+
+                    <line x1="200"
+                          y1="355"
+                          x2="810"
+                          y2="355"/>
+
+                    <circle cx="500"
+                            cy="230"
+                            r="9"/>
+
+                    <circle cx="190"
+                            cy="105"
+                            r="7"/>
+
+                    <circle cx="810"
+                            cy="105"
+                            r="7"/>
+
+                    <circle cx="200"
+                            cy="355"
+                            r="7"/>
+
+                    <circle cx="810"
+                            cy="355"
+                            r="7"/>
+
+                </svg>
+
+
+                <div class="node-label node-center">
+                    DATABASE
+                </div>
+
+                <div class="node-label node-user">
+                    USUARIO
+                </div>
+
+                <div class="node-label node-product">
+                    PRODUCTO
+                </div>
+
+                <div class="node-label node-buy">
+                    COMPRA
+                </div>
+
+                <div class="node-label node-recommend">
+                    RECOMENDACIÓN
+                </div>
+
+            </div>
+
+
+            <div class="curiosity">
+
+                <button
+                    class="curiosity-button"
+                    onclick="showAnswer('answer1')">
+
+                    <strong>
+                        ¿Qué es un nodo?
+                    </strong>
+
+                    <small>
+                        explorar concepto
+                    </small>
+
+                </button>
+
+
+                <button
+                    class="curiosity-button"
+                    onclick="showAnswer('answer2')">
+
+                    <strong>
+                        ¿Qué es una relación?
+                    </strong>
+
+                    <small>
+                        explorar concepto
+                    </small>
+
+                </button>
+
+
+                <button
+                    class="curiosity-button"
+                    onclick="showAnswer('answer3')">
+
+                    <strong>
+                        ¿Por qué usar grafos?
+                    </strong>
+
+                    <small>
+                        explorar concepto
+                    </small>
+
+                </button>
+
+
+                <button
+                    class="curiosity-button"
+                    onclick="showAnswer('answer4')">
+
+                    <strong>
+                        ¿Dónde aparecen?
+                    </strong>
+
+                    <small>
+                        explorar concepto
+                    </small>
+
+                </button>
+
+            </div>
+
+
+            <div id="answer1"
+                 class="answer">
+
+                Un nodo representa una entidad o elemento.
+
+                Puede representar una persona, producto,
+                lugar, evento u objeto dentro de un sistema.
+
+            </div>
+
+
+            <div id="answer2"
+                 class="answer">
+
+                Una relación representa la conexión entre
+                diferentes nodos.
+
+                Por ejemplo:
+
+                <strong>
+                    usuario → COMPRA → producto
+                </strong>
+
+            </div>
+
+
+            <div id="answer3"
+                 class="answer">
+
+                Porque algunas preguntas dependen más de
+                las conexiones que de los datos individuales.
+
+                Los grafos permiten representar esas conexiones
+                directamente.
+
+            </div>
+
+
+            <div id="answer4"
+                 class="answer">
+
+                En sistemas de recomendaciones, redes sociales,
+                rutas, relaciones entre personas, análisis de
+                conexiones y otros problemas donde los vínculos
+                son importantes.
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <div class="footer-inner">
+
+            <div>
+
+                <div class="footer-title">
+                    BASES DE DATOS RECAP
+                </div>
+
+                <div class="footer-info">
+
+                    Artefacto de salida de aprendizaje
+                    <br>
+                    Fundamentos de bases de datos
+
+                </div>
+
+            </div>
+
+
+            <div class="footer-info">
+
+                SILVA CORTES GRECIA CAROLINA
+                <br>
+
+                4-A
+                <br>
+
+                BASES DE DATOS 1
+                <br>
+
+                UTD
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        function showAnswer(id) {
+
+            const answers =
+                document.querySelectorAll(".answer");
+
+            answers.forEach(answer => {
+                answer.classList.remove("active");
+            });
+
+            const selected =
+                document.getElementById(id);
+
+            selected.classList.add("active");
+
+            selected.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
